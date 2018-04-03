@@ -11,7 +11,7 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 
 # Read in data
 ```{r}
-fpdata_wide <- read.delim("~/Desktop/WORK/IRL/FacePrince/FacePrince-master/2018_data_nozeros.csv",header=TRUE, sep="," ,na.strings = "-")
+fpdata_wide <- read.delim("/Users/Pala/Desktop/AllFolders/WORK/IRL/FacePrince/FacePrince-master/2018_data_nozeros.csv",header=TRUE, sep="," ,na.strings = "-")
 fpdata_wide
 ```
 
@@ -33,7 +33,7 @@ fpdata_long
 fpdata_long = fpdata_long %>% 
   arrange(Participant, trial)
 
-#Check that all participant have the right amount of trials
+#Check that all participants have the right amount of trials
 fpdata_long %>%
   dplyr::group_by(Participant) %>%
   summarize(N=n())
@@ -45,7 +45,7 @@ fpdata_long %>%
 
 ```{r}
 #Import MSL
-fpdata_MSL <- read.delim("~/Desktop/WORK/IRL/FacePrince/FacePrince-master/FP_MSL.csv",header=TRUE, sep="," )
+fpdata_MSL <- read.delim("~/Desktop/AllFolders/WORK/IRL/FacePrince/FacePrince-master/FP_MSL.csv",header=TRUE, sep="," )
 
 #Make sure column names match with dataset
    #use package:: to specify which package you want to use the function from
@@ -57,7 +57,7 @@ fpdata_MSLmerged <- full_join(fpdata_long,fpdata_MSL,by="Participant",copy=FALSE
 # Merge trial info
 ```{r}
 #import trial info
-trial_info <- read.delim("~/Desktop/WORK/IRL/FacePrince/FacePrince-master/LittlePrince_TrialInfo.csv",header=TRUE, sep="," )
+trial_info <- read.delim("~/Desktop/AllFolders/WORK/IRL/FacePrince/FacePrince-master/LittlePrince_TrialInfo.csv",header=TRUE, sep="," )
 
 #make sure column names match with merged dataset
 trial_info <- plyr::rename(trial_info,c("MediaName"= "trial.short"))
