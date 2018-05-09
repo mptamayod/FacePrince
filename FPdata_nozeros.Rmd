@@ -9,22 +9,27 @@ Try executing this chunk by clicking the *Run* button within the chunk or by pla
 
 
 
-# Read in data
+# Read in FP12 data
 ```{r}
-fpdata_wide <- read.delim("/Users/Pala/Desktop/AllFolders/WORK/IRL/FacePrince/FacePrince-master/2018_data_nozeros.csv",header=TRUE, sep="," ,na.strings = "-")
-fpdata_wide
+fp12data_wide <- read.delim("/Users/Pala/Desktop/AllFolders/WORK/IRL/FacePrince/FacePrince-master/FP12_Feb2018_data.csv",header=TRUE, sep="," ,na.strings = "-")
 ```
-
-
-# Convert from wide to long
+# Read in FP18 data
+```{r}
+fp18data_wide <- read.delim("/Users/Pala/Desktop/AllFolders/WORK/IRL/FacePrince/FacePrince-master/FP18_May2018_data.csv",header=TRUE, sep="," ,na.strings = "-")
+```
+# Merge FP12 and FP18 data
+```{r}
+fpdata_merged <- full_join(fp12data_wide,fp18data_wide,copy=FALSE,suffix=c(".x", ".y"))
+```
+# Convert merged data.frame from wide to long
 ```{r}
 
 #load tidyr package
 library(tidyverse)
 
 #code to go from wide to long
-fpdata_long = fpdata_wide %>% 
-  gather( key =trial, value=total_fixation, Fem_Eng_1:Male_Fr_Switch.2, factor_key=TRUE) %>%
+fpdata_long = fpdata_merged %>% 
+  gather( key =trial, value=total_fixation, Fem_Eng_1:Male_Fr_Switch.3, factor_key=TRUE) %>%
   na.omit(total_fixation) %>% # delete NA rows
   mutate(trial.short = gsub("\\..*","",trial))
 fpdata_long
@@ -66,7 +71,6 @@ trial_info = trial_info %>% mutate(order = as.numeric(gsub("O","", trial.order))
 #code for merging
 fpdata_allmerged <- left_join(fpdata_MSLmerged,trial_info,
                               copy=FALSE,suffix=c(".x", ".y"))
-
 fpdata_allmerged = fpdata_allmerged %>%
   filter(Participant!=" ")
 
@@ -76,10 +80,20 @@ fpdata_allmerged$Phase = ifelse(fpdata_allmerged$trial.type=="familiarization","
 ```
 #summarize by group and filter by test
 ```{r}
-(fp_summary = fpdata_allmerged %>% 
-  filter(Phase!="fam") %>%
-  group_by(trial.type) %>% # here add more variables if you want to know differenced by language group, age...
+fp_summarized_data <- (fp_summary = fpdata_allmerged %>% 
+  filter(Phase!="fam") %>% #filter bil 12 subject
+  group_by(lang_group,age_group,trial.type) %>% 
   summarize(mean=mean(total_fixation)))
+fp_summarized_data
 ```
+#create graph with ggplot
+```{r}
+#load ggplot package
+library(ggplot2)
+
+# code to create graph
+ggplot(data=fp_summarized_data,aes(x=lang_group,y=mean,fill=trial.type))+geom_bar(colour="black",stat="identity",position="dodge")+facet_grid(.~age_group)+ scale_fill_manual("trial.type", values = c("test.same"= "cornflowerblue", "test.switch" = "royalblue4"))+ylab("Looking time (s)")+xlab("")+ggtitle("   Preliminary Results")+theme_bw(base_size = 17)+theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+#Next step: ez package for ANOVA
 
 
